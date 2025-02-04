@@ -1,0 +1,39 @@
+syntax = "proto3";
+package online;
+
+option go_package = "online/api";
+
+service GameService {
+  rpc Join (JoinRequest) returns (JoinResponse);
+  rpc ServerMove (ServerMoveRequest) returns (stream ServerMoveResponse);
+  rpc ClientMove (ClientMoveRequest) returns (ClientMoveResponse);
+}
+
+message JoinRequest {
+  string ip = 1;
+}
+
+message JoinResponse {
+  bool success = 1;
+  string clientPlayer = 2;
+}
+
+message ServerMoveRequest{}
+
+message ServerMoveResponse {
+  int32 position = 1;
+  repeated string board = 2;
+  string currentPlayer = 3;
+  bool isGameFinished = 4;
+}
+
+message ClientMoveRequest {
+  int32 position = 1;
+}
+
+message ClientMoveResponse {
+  bool success = 1; 
+  repeated string board = 2;
+  string currentPlayer = 3;
+  bool isGameFinished = 4;
+}
