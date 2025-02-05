@@ -2,17 +2,33 @@ document.addEventListener("DOMContentLoaded", () => {
     const gameBoard = document.getElementById("game-board");
     const status = document.getElementById("status");
     const playAgainButton = document.getElementById("play-again-button");
+    const homeButton = document.getElementById("home-button");
     const playerXScore = document.getElementById("player-x-score");
     const playerOScore = document.getElementById("player-o-score");
+    const sessionIdElement = document.getElementById("session-id");
 
     playAgainButton.addEventListener("click", () => {
         socket.send(JSON.stringify({ action: "reset" }));
     });
 
+    homeButton.addEventListener("click", () => {
+        window.location.href = "index.html";
+    });
+
     let currentPlayer = "X";
     let board = Array(9).fill("");
-    const sessionID = new URLSearchParams(window.location.search).get("session") || "default";
-    let socket = new WebSocket(`ws://localhost:8080/ws?session=${sessionID}`);
+    const sessionID = new URLSearchParams(window.location.search).get("session");
+    let socket;
+
+    if (sessionID === "new") {
+        const newSessionID = Date.now().toString();
+        socket = new WebSocket(`ws://localhost:8080/ws?session=${newSessionID}`);
+        sessionIdElement.textContent = newSessionID;
+    } else {
+        socket = new WebSocket(`ws://localhost:8080/ws?session=${sessionID}`);
+        sessionIdElement.textContent = sessionID;
+    }
+
     let playerSymbol = "";
     let scores = { X: 0, O: 0 };
 
@@ -68,6 +84,11 @@ document.addEventListener("DOMContentLoaded", () => {
         board.forEach((cell, index) => {
             const cellElement = document.createElement("div");
             cellElement.classList.add("cell");
+            if (cell === "X") {
+                cellElement.classList.add("x");
+            } else if (cell === "O") {
+                cellElement.classList.add("o");
+            }
             cellElement.textContent = cell;
             cellElement.addEventListener("click", () => handleCellClick(index));
             gameBoard.appendChild(cellElement);

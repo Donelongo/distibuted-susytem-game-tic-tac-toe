@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tic Tac Toe</title>
+    <link rel="stylesheet" href="styles.css">
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <button id="home-button" class="top-left-button">Home</button>
+    <h1>Welcome to Tic Tac Toe!</h1>
+    <div id="game-container">
+        <div id="scoreboard">
+            <div id="player-x-score">Player X: 0</div>
+            <div id="player-o-score">Player O: 0</div>
+        </div>
+        <div id="game-board">
+            <!-- Game board cells will be generated here -->
+        </div>
+        <div id="status"></div>
+        <div id="session-id-container">
+            <p>Session ID: <span id="session-id"></span></p>
+        </div>
+        <button id="play-again-button" style="display: none;">Play Again</button>
+    </div>
+    <div id="game-rules">
+        <h2>Game Rules</h2>
+        <p>Tic Tac Toe is a simple game played on a 3x3 grid. The goal is to get three of your symbols (X or O) in a row, column, or diagonal.</p>
+        <p>Players take turns placing their symbols on the grid. The first player to get three in a row wins. If all nine cells are filled and no player has three in a row, the game is a tie.</p>
+    </div>
+    <script src="scripts.js"></script>
+</body>
+</html>

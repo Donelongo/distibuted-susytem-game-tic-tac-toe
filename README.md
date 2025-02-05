@@ -1,58 +1,75 @@
-# Golang TicTacToe Game - Multiplayer(WebSocket)
+# Tic Tac Toe
 
----
+Welcome to the Tic Tac Toe game! This project allows you to play Tic Tac Toe against a friend locally.
 
-## About the project
+## Features
 
-The main purpose of this project is to learn WebSocket and Golang by practicing.
-
-I implemented a TicTacToe game in Golang. It has a simple web interface and a WebSocket server. The WebSocket server can be used to play the game with multiple players.
-
----
+- Play against a friend locally.
+- Continue an existing game using a session ID.
+- Navigate back to the home page using the "Home" button.
+- Multiple game sessions can be conducted simultaneously.
 
 ## Getting Started
 
-#### Prerequisites
+### Prerequisites
 
-- Golang 1.19 or higher
+- Go 1.16 or later
+- A web browser
 
-#### How to run
+### Installation
 
-1. Clone the repository
-2. Run `go run cmd/main.go`
+1. Clone the repository:
+    ```sh
+    git clone https://github.com/yourusername/tic-tac-toe.git
+    cd tic-tac-toe
+    ```
 
-#### Running Multiple Clients
+2. Install dependencies:
+    ```sh
+    go mod tidy
+    ```
 
-To run multiple clients, use different session IDs in the URL:
+### Running the Game
 
-1. Open `http://localhost:8080/?session=session1` in one browser tab
-2. Open `http://localhost:8080/?session=session2` in another browser tab
+1. Start the Go server:
+    ```sh
+    go run cmd/main.go
+    ```
 
-Each session ID represents a different game session.
+2. Open your web browser and navigate to `http://localhost:8080/`.
 
----
+### How to Play
 
-## Play Against Your Friend - WebSocket Part
+#### Main Menu
 
-When you choose `Play against your friend`, you can host a game or join a game.
+When you open the game in your browser, you will see the main menu with the following options:
 
-1. `Host`: You will be the host of the game. You have to wait for your friend to join the game.
-2. `Join`: You will be the guest of the game. You have to enter the host's IP address to join the game.
+- **New Game**: Start a new game session.
+- **Continue Game**: Continue an existing game by entering the session ID.
 
----
+#### New Game
 
-## Issues
+1. Click the "New Game" button.
+2. You will be redirected to the game page, and a new session ID will be generated and displayed on the page.
+3. Play the game by clicking on the cells to place your symbol (X or O).
 
-- [ ] The game doesn't work properly when you play against your friend. The game ends when someone wins but you can not do anything at that point in the web interface, you need to refresh the page. `Play Again` or `Return Menu` options may be added.
+#### Continue Game
 
----
+1. Click the "Continue Game" button.
+2. Enter the session ID of the game you want to continue.
+3. You will be redirected to the game page, and the game will continue from where it left off.
 
-## License
+#### Home Button
 
-Distributed under the GPL License. See `LICENSE` for more information.
+- On the game page, you will see a "Home" button at the top left corner.
+- Click the "Home" button to navigate back to the main menu.
 
----
+### Project Structure
 
-## Contribution
+- `cmd/main.go`: The main entry point for the Go server.
+- `internal/`: Contains the game logic and utilities.
+- `web/`: Contains the HTML, CSS, and JavaScript files for the web interface.
 
-Any contributions you make are greatly appreciated.
+### Contributing
+
+Contributions are welcome! Please fork the repository and submit a pull request.
