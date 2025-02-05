@@ -20,8 +20,6 @@ I implemented a TicTacToe game in Golang. It has a simple web interface and a We
 
 1. Clone the repository
 2. Run `go run cmd/main.go`
-3. Open `http://localhost:8080` in your browser
-4. Select `Play against your friend`
 
 #### Running Multiple Clients
 
