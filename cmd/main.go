@@ -24,6 +24,7 @@ type GameSession struct {
 	Scores          map[string]int
 	Clients         []*websocket.Conn
 	PlayerSymbols   map[*websocket.Conn]string
+	Disconnected    map[string]string // Track disconnected clients by their symbol
 	mu              sync.Mutex
 }
 
@@ -76,6 +77,7 @@ func main() {
 				Scores:          map[string]int{"X": 0, "O": 0},
 				Clients:         []*websocket.Conn{},
 				PlayerSymbols:   make(map[*websocket.Conn]string),
+				Disconnected:    make(map[string]string),
 			}
 			sessions[sessionID] = session
 		}
@@ -85,6 +87,13 @@ func main() {
 			session.PlayerSymbols[conn] = "X"
 		} else if len(session.PlayerSymbols) == 1 {
 			session.PlayerSymbols[conn] = "O"
+		} else {
+			// Reassign symbol if reconnecting
+			for symbol, _ := range session.Disconnected {
+				session.PlayerSymbols[conn] = symbol
+				delete(session.Disconnected, symbol)
+				break
+			}
 		}
 		session.mu.Unlock()
 		sessionsMu.Unlock()
@@ -150,10 +159,16 @@ func main() {
 			}
 			session.mu.Unlock()
 		}
+
+		// Handle disconnection
+		session.mu.Lock()
+		symbol := session.PlayerSymbols[conn]
+		session.Disconnected[symbol] = symbol
+		delete(session.PlayerSymbols, conn)
+		session.mu.Unlock()
+
 		conn.Close()
 	})
 
 	http.ListenAndServe(":8080", nil)
 }
-
-//! the issue that i have to fix is that after recoveringa  and if player one is the one on turn u can see the game updating for player 2 as well but player two can play.
