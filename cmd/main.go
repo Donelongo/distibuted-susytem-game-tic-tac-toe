@@ -16,12 +16,7 @@ var upgrader = websocket.Upgrader{
 }
 
 type GameSession struct {
-	Board           []string
-	CurrentPlayer   string
-	Finished        bool
-	Winner          string
-	PreviousStarter string
-	Scores          map[string]int
+	Game            *game.GameBoard
 	Clients         []*websocket.Conn
 	PlayerSymbols   map[*websocket.Conn]string
 	Disconnected    map[string]string // Track disconnected clients by their symbol
@@ -71,13 +66,10 @@ func main() {
 		session, exists := sessions[sessionID]
 		if !exists {
 			session = &GameSession{
-				Board:           make([]string, 9),
-				CurrentPlayer:   "X",
-				PreviousStarter: "X",
-				Scores:          map[string]int{"X": 0, "O": 0},
-				Clients:         []*websocket.Conn{},
-				PlayerSymbols:   make(map[*websocket.Conn]string),
-				Disconnected:    make(map[string]string),
+				Game:          game.NewGame(),
+				Clients:       []*websocket.Conn{},
+				PlayerSymbols: make(map[*websocket.Conn]string),
+				Disconnected:  make(map[string]string),
 			}
 			sessions[sessionID] = session
 		}
@@ -101,10 +93,10 @@ func main() {
 		conn.WriteJSON(map[string]interface{}{
 			"action":        "assign",
 			"symbol":        session.PlayerSymbols[conn],
-			"board":         session.Board,
-			"currentPlayer": session.CurrentPlayer,
-			"finished":      session.Finished,
-			"winner":        session.Winner,
+			"board":         session.Game.GetBoard(),
+			"currentPlayer": session.Game.GetCurrentPlayer(),
+			"finished":      session.Game.IsFinished(),
+			"winner":        session.Game.GetWinner(),
 		})
 
 		for {
@@ -123,35 +115,21 @@ func main() {
 
 			session.mu.Lock()
 			if msg.Action == "reset" {
-				session.Board = make([]string, 9)
-				if session.Winner == "-" {
-					if session.PreviousStarter == "X" {
-						session.CurrentPlayer = "O"
-					} else {
-						session.CurrentPlayer = "X"
-					}
-				} else {
-					session.CurrentPlayer = session.Winner
-				}
-				session.PreviousStarter = session.CurrentPlayer
-				session.Finished = false
-				session.Winner = ""
+				session.Game = game.NewGame()
 				for client := range session.PlayerSymbols {
 					session.PlayerSymbols[client] = ""
 				}
 				for _, client := range session.Clients {
 					client.WriteJSON(map[string]string{
 						"action":        "start",
-						"currentPlayer": session.CurrentPlayer,
+						"currentPlayer": session.Game.GetCurrentPlayer(),
 					})
 				}
 			} else if msg.Action == "update" {
-				session.Board = msg.Board
-				session.CurrentPlayer = msg.CurrentPlayer
-				session.Finished = msg.Finished
-				session.Winner = msg.Winner
-				if msg.Winner != "-" {
-					session.Scores[msg.Winner]++
+				session.Game.SetBoard(msg.Board)
+				session.Game.SwitchCurrentPlayer()
+				if session.Game.CheckGameFinished() {
+					session.Game.GetWinner()
 				}
 			}
 			for _, client := range session.Clients {
